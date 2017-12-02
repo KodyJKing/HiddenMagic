@@ -1,0 +1,16 @@
+[
+{
+  "modid": "hiddenmagic",
+  "name": "Hidden Magic",
+  "description": "Find and use powerful magic hidden in everyday objects.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["kjk"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
