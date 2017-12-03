@@ -19,9 +19,9 @@ public abstract class MagicType {
         id = idCounter++;
     }
 
-    public abstract int flowInto(World world, BlockPos pos, int amount);
-
     public static Set<Block> set(Block... blocks) {
         return Sets.newHashSet(blocks);
     }
+
+    public abstract int flowInto(World world, BlockPos pos, int amount);
 }

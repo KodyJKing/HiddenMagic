@@ -12,7 +12,6 @@ import java.util.Random;
 
 // Hooks are called by hiddenmagiccore.
 public class CoreHooks {
-    // HOOK
     public static void leafTick(BlockLeaves block, World world, BlockPos pos, IBlockState state, Random rand) {
         int light = 0;
         for(int x = -1; x <= 1; x++){

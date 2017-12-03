@@ -78,11 +78,11 @@ public class Flow {
 
             BlockPos p = open.pop();
             for(BlockPos n: neighbors(p)){
-//					System.out.println(
-//						"Scanning: "
-//						+ Integer.toString(n.getX()) + ", "
-//						+ Integer.toString(n.getY()) + ", "
-//						+ Integer.toString(n.getZ()));
+//                System.out.println(
+//                    "Scanning: "
+//                    + Integer.toString(n.getX()) + ", "
+//                    + Integer.toString(n.getY()) + ", "
+//                    + Integer.toString(n.getZ()));
                 if(isClosed(n))
                     continue;
                 close(n);
