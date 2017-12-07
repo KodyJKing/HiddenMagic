@@ -1,5 +1,6 @@
 package hiddenmagic.magictype;
 
+import hiddenmagic.chunkextension.WorldExtensions;
 import hiddenmagic.flow.Flow;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -12,7 +13,7 @@ public class MagicLife extends MagicType {
 
     private static Set<Block> leaves = set(Blocks.LEAVES);
     private static Set<Block> mediums = set(Blocks.LOG, Blocks.LOG2);
-    private static Set<Block> sinks = set(Blocks.DOUBLE_PLANT);
+    private static Set<Block> sinks = set(Blocks.MELON_BLOCK);
 
     public MagicLife(String name) {
         super(name);
@@ -46,6 +47,7 @@ public class MagicLife extends MagicType {
 
     private int flowToConsumer(World world, BlockPos pos, int amount) {
         System.out.println("flowToConsumer");
+        WorldExtensions.LIFE_MAGIC.add(pos, amount);
         return 0;
     }
 

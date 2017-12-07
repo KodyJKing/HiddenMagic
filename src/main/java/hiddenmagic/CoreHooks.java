@@ -5,8 +5,10 @@ import hiddenmagic.magictype.MagicTypes;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.Random;
 
@@ -24,5 +26,11 @@ public class CoreHooks {
             }
         }
         MagicTypes.LIFE.flowInto(world, pos, light / 27);
+    }
+
+    public static void setBlockState(Chunk chunk, BlockPos pos, IBlockState state) {
+        World world = chunk.getWorld();
+        if (!world.isRemote && state.getBlock() == Blocks.LOG)
+            System.out.println("adding log");
     }
 }
