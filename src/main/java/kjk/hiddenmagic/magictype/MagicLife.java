@@ -1,6 +1,6 @@
-package hiddenmagic.magictype;
+package kjk.hiddenmagic.magictype;
 
-import hiddenmagic.chunkextension.WorldExtensions;
+import kjk.hiddenmagic.blockextension.BlockExtensions;
 import hiddenmagic.flow.Flow;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -47,7 +47,7 @@ public class MagicLife extends MagicType {
 
     private int flowToConsumer(World world, BlockPos pos, int amount) {
         System.out.println("flowToConsumer");
-        WorldExtensions.LIFE_MAGIC.add(pos, amount);
+        BlockExtensions.LIFE_MAGIC.add(world.provider.getDimension(), pos, amount);
         return 0;
     }
 

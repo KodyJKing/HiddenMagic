@@ -1,11 +1,10 @@
-package hiddenmagic.chunkextension;
+package kjk.hiddenmagic.blockextension;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.event.world.ChunkDataEvent;
 
-public class WELifeMagic extends WorldExtension<Integer> {
+public class BELifeMagic extends BlockExtension<Integer> {
 
     @Override
     public String name() {
@@ -22,8 +21,9 @@ public class WELifeMagic extends WorldExtension<Integer> {
         return ((NBTTagInt)nbt).getInt();
     }
 
-    public void add(BlockPos pos, int amount) {
-        set(pos, get(pos) + amount);
+    public void add(int dimension, BlockPos pos, int amount) {
+        WorldExtension<Integer> we = getWorldExtension(dimension);
+        we.set(pos, we.get(pos) + amount);
     }
 
     @Override

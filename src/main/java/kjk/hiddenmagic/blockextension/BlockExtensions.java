@@ -1,13 +1,13 @@
-package hiddenmagic.chunkextension;
+package kjk.hiddenmagic.blockextension;
 
 import net.minecraftforge.common.MinecraftForge;
 
-public class WorldExtensions {
+public class BlockExtensions {
 
-    public static WELifeMagic LIFE_MAGIC;
+    public static BELifeMagic LIFE_MAGIC;
 
     public static void initialize() {
-        LIFE_MAGIC = new WELifeMagic();
+        LIFE_MAGIC = new BELifeMagic();
 
         MinecraftForge.EVENT_BUS.register(LIFE_MAGIC);
     }

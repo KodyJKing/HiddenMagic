@@ -1,4 +1,4 @@
-package hiddenmagic.magictype;
+package kjk.hiddenmagic.magictype;
 
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
