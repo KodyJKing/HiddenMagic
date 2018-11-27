@@ -1,4 +1,4 @@
-package hiddenmagic.common;
+package kjk.hiddenmagic.common;
 
 import java.util.Random;
 

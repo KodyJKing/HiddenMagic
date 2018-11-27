@@ -2,12 +2,17 @@ package kjk.hiddenmagic;
 
 import kjk.hiddenmagic.blockextension.BlockExtensions;
 import kjk.hiddenmagic.blockextension.WorldExtension;
+import kjk.hiddenmagic.common.CMath;
+import kjk.hiddenmagic.common.CWorld;
 import kjk.hiddenmagic.common.Common;
+import kjk.hiddenmagic.magictype.MagicTypes;
 import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -55,11 +60,28 @@ public class ModEvents {
                         IBlockState bs = storage.get(dx, dy, dz);
                         Block block = bs.getBlock();
 
+                        if (block instanceof BlockLeaves)
+                            tickLeaves(world, pos);
+
                     }
                 }
             }
 
         });
+    }
+
+    void tickLeaves(World world, BlockPos pos) {
+        int light = 0;
+        for(int x = -1; x <= 1; x++){
+            for(int y = -1; y <= 1; y++){
+                for(int z = -1; z <= 1; z++) {
+                    BlockPos p = pos.add(x, y, z);
+                    if (world.getBlockState(p).getMaterial() == Material.LEAVES)
+                        light += CWorld.skyLight(world, p);
+                }
+            }
+        }
+        MagicTypes.LIFE.flowInto(world, pos, light / 27);
     }
 
     @SubscribeEvent
@@ -73,10 +95,23 @@ public class ModEvents {
             return;
         BlockPos pos = event.getPos();
 
-        int dimension = world.provider.getDimension();
         WorldExtension<Integer> we = BlockExtensions.LIFE_MAGIC.getWorldExtension(world);
         int magic = we.get(pos);
+
+        double activation = Math.log(magic + 1);
+        for (int i = 0; i < activation; i++) {
+            double vx = CMath.rand.nextGaussian() * 0.02D;
+            double vy = CMath.rand.nextGaussian() * 0.02D;
+            double vz = CMath.rand.nextGaussian() * 0.02D;
+            world.spawnParticle(
+                    EnumParticleTypes.VILLAGER_HAPPY,
+                    (double)((float)pos.getX() + CMath.rand.nextFloat()),
+                    (double)pos.getY() + (double)CMath.rand.nextFloat(),
+                    (double)((float)pos.getZ() + CMath.rand.nextFloat()),
+                    vx, vy, vz);
+        }
+
         Common.message(player, Integer.toString(magic));
-        we.set(pos, ++magic);
+//        we.set(pos, ++magic);
     }
 }

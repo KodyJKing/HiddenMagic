@@ -7,6 +7,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.ChunkDataEvent;
+import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.HashMap;
@@ -27,23 +29,20 @@ public abstract class BlockExtension<T> {
 
     // Representation / access
 
-    private HashMap<Integer, WorldExtension> worldExtensions = new HashMap<>();
+    private HashMap<Integer, WorldExtension<T>> worldExtensions = new HashMap<>();
 
     private String extensionName() {
         return HiddenMagic.MODID + "_" + name();
     }
 
-    public WorldExtension<T> getWorldExtension(int dimension) {
+    public WorldExtension<T> getWorldExtension(World world) {
+        int dimension = world.provider.getDimension();
         WorldExtension<T> we = worldExtensions.get(dimension);
         if (we == null) {
-            we = new WorldExtension<T>(this);
-            worldExtensions.put(dimension, new WorldExtension<T>(this));
+            we = new WorldExtension<T>(this, world);
+            worldExtensions.put(dimension, we);
         }
         return we;
-    }
-
-    public WorldExtension<T> getWorldExtension(World world) {
-        return getWorldExtension(world.provider.getDimension());
     }
 
     // Persistence
@@ -56,8 +55,8 @@ public abstract class BlockExtension<T> {
 
         NBTTagList blockExtensions = nbt.getTagList(extensionName(), 10);
 
-//        System.out.println("Loading chunk extension: " + name());
-//        System.out.println(blockExtensions.toString());
+        System.out.println("Loading chunk extension: " + name());
+        System.out.println(blockExtensions.toString());
 
         WorldExtension<T> worldExtension = getWorldExtension(event.getWorld());
 
@@ -65,10 +64,10 @@ public abstract class BlockExtension<T> {
             NBTTagCompound blockExtension = (NBTTagCompound)nbtBase;
             BlockPos pos = BlockPos.fromLong(blockExtension.getLong("p"));
             T value = fromNBT(blockExtension.getTag("d"));
-            worldExtension.set(pos, value);
+            worldExtension.set(pos, value, true);
 
-//            System.out.println("Loading at: " + pos.toString());
-//            System.out.println("Value: " + String.valueOf(value));
+            System.out.println("Loading at: " + pos.toString());
+            System.out.println("Value: " + String.valueOf(value));
         });
     }
 
@@ -79,7 +78,7 @@ public abstract class BlockExtension<T> {
         if (chunk == null)
             return;
 
-//        System.out.println("Saving chunk extension: " + name());
+        System.out.println("Saving chunk extension: " + name());
 
         NBTTagCompound nbt = event.getData();
         NBTTagList blockExtensions = new NBTTagList();
@@ -90,11 +89,23 @@ public abstract class BlockExtension<T> {
             blockExtension.setTag("d", toNBT(worldExtension.get(pos)));
             blockExtensions.appendTag(blockExtension);
 
-//            System.out.println("Saving at: " + pos.toString());
-//            System.out.println("Value: " + String.valueOf(value));
+            System.out.println("Saving at: " + pos.toString());
+            System.out.println("Value: " + String.valueOf(value));
         });
         nbt.setTag(extensionName(), blockExtensions);
 
 //        System.out.println(blockExtensions.toString());
+    }
+
+    @SubscribeEvent
+    public void unloadChunk(ChunkEvent.Unload event) {
+        WorldExtension<T> worldExtension = getWorldExtension(event.getWorld());
+        worldExtension.removeChunk(event.getChunk().getPos());
+    }
+
+    @SubscribeEvent
+    public void unloadWorld(WorldEvent.Unload event) {
+        WorldExtension<T> we = getWorldExtension(event.getWorld());
+        we.clear();
     }
 }

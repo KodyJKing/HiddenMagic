@@ -1,4 +1,4 @@
-package hiddenmagic.flow;
+package kjk.hiddenmagic.flow;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 
 public class Flow {
 
-    public static int tryFlow(World world, BlockPos source, int amount, int maxDepth, boolean shareFlow, Set<Block> mediums, Set<Block> sinks, hiddenmagic.flow.FlowHandler flowInto){
+    public static int tryFlow(World world, BlockPos source, int amount, int maxDepth, boolean shareFlow, Set<Block> mediums, Set<Block> sinks, FlowHandler flowInto){
         Flow flow = new Flow(world, source, maxDepth, mediums, sinks);
         ArrayList<BlockPos> sinkPositions = new ArrayList<>();
         while(true){

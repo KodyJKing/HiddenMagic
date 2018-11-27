@@ -3,6 +3,7 @@ package kjk.hiddenmagic.blockextension;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class BELifeMagic extends BlockExtension<Integer> {
 
@@ -21,8 +22,8 @@ public class BELifeMagic extends BlockExtension<Integer> {
         return ((NBTTagInt)nbt).getInt();
     }
 
-    public void add(int dimension, BlockPos pos, int amount) {
-        WorldExtension<Integer> we = getWorldExtension(dimension);
+    public void add(World world, BlockPos pos, int amount) {
+        WorldExtension<Integer> we = getWorldExtension(world);
         we.set(pos, we.get(pos) + amount);
     }
 

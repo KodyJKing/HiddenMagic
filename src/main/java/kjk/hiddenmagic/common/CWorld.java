@@ -1,4 +1,4 @@
-package hiddenmagic.common;
+package kjk.hiddenmagic.common;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;

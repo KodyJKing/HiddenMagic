@@ -15,6 +15,7 @@ public class Common {
     }
 
     public static void message(EntityPlayer player, String msg) {
+        System.out.println(msg);
         player.sendMessage( new TextComponentString(msg) );
     }
 }
