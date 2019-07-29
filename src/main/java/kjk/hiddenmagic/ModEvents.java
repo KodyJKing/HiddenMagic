@@ -2,6 +2,7 @@ package kjk.hiddenmagic;
 
 import kjk.hiddenmagic.blockextension.BlockExtensions;
 import kjk.hiddenmagic.blockextension.WorldExtension;
+import kjk.hiddenmagic.chunkextension.CapabilityChunkExtension;
 import kjk.hiddenmagic.chunkextension.ChunkExtension;
 import kjk.hiddenmagic.common.CMath;
 import kjk.hiddenmagic.common.CWorld;
@@ -13,6 +14,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
@@ -22,6 +24,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -109,7 +112,6 @@ public class ModEvents {
         ChunkExtension ce = chunk.getCapability(ChunkExtension.capability, EnumFacing.UP).get();
         chunk.markDirty();
         if (ce != null) {
-            System.out.println("CE exists!");
             System.out.println(ce.foo);
             ce.foo++;
         }
@@ -137,13 +139,24 @@ public class ModEvents {
 
     @SubscribeEvent
     public void attatchChunkCapabilities(AttachCapabilitiesEvent<Chunk> event) {
-        event.addCapability(new ResourceLocation(HiddenMagic.MODID, "chunkextension"), new ICapabilityProvider() {
+        CapabilityChunkExtension ce = new CapabilityChunkExtension();
+        event.addCapability(new ResourceLocation(HiddenMagic.MODID, "chunkextension"), new ICapabilitySerializable() {
+            @Override
+            public NBTBase serializeNBT() {
+                return null;
+            }
+
+            @Override
+            public void deserializeNBT(NBTBase nbt) {
+
+            }
+
             public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
                 return true;
             }
 
             public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-                return capability.getDefaultInstance();
+                return (T) ce;
             }
         });
     }
