@@ -46,7 +46,7 @@ public class MagicLife extends MagicType {
     }
 
     private int flowToConsumer(World world, BlockPos pos, int amount) {
-        System.out.println("flowToConsumer");
+//        System.out.println("flowToConsumer");
         BlockExtensions.LIFE_MAGIC.add(world, pos, amount);
         return 0;
     }
