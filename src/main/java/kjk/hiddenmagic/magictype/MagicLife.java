@@ -1,6 +1,5 @@
 package kjk.hiddenmagic.magictype;
 
-import kjk.hiddenmagic.blockextension.BlockExtensions;
 import kjk.hiddenmagic.flow.Flow;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -17,6 +16,10 @@ public class MagicLife extends MagicType {
 
     public MagicLife(String name) {
         super(name);
+        capacities.put(Blocks.LEAVES, 4);
+        capacities.put(Blocks.LOG, 8);
+        capacities.put(Blocks.LOG2, 8);
+        capacities.put(Blocks.MELON_BLOCK, 2048);
     }
 
     @Override
@@ -33,7 +36,7 @@ public class MagicLife extends MagicType {
         return Flow.tryFlow(
                 world, pos, amount,5, false,
                 leaves, mediums,
-                (World w, BlockPos p, int a) -> flowToSinks(w, p, a)
+                this::flowToSinks
         );
     }
 
@@ -41,13 +44,12 @@ public class MagicLife extends MagicType {
         return Flow.tryFlow(
                 world, pos, amount,1024, true,
                 mediums, sinks,
-                (World w, BlockPos p, int a) -> flowToConsumer(w, p, a)
+                this::flowToConsumer
         );
     }
 
     private int flowToConsumer(World world, BlockPos pos, int amount) {
-        System.out.println("flowToConsumer");
-        BlockExtensions.LIFE_MAGIC.add(world, pos, amount);
+        this.add(world, pos, amount);
         return 0;
     }
 

@@ -10,8 +10,12 @@ import java.util.Iterator;
 
 public class Common {
     public static Iterator<Chunk> getTickableChunks(World world) {
-        WorldServer ws = world.getMinecraftServer().worlds[world.provider.getDimension()];
-        return world.getPersistentChunkIterable(ws.getPlayerChunkMap().getChunkIterator());
+        try {
+            WorldServer ws = world.getMinecraftServer().worlds[world.provider.getDimension()];
+            return world.getPersistentChunkIterable(ws.getPlayerChunkMap().getChunkIterator());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static void message(EntityPlayer player, String msg) {

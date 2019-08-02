@@ -1,6 +1,6 @@
 package kjk.hiddenmagic;
 
-import kjk.hiddenmagic.blockextension.BlockExtensions;
+import kjk.hiddenmagic.magictype.MagicTypes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -27,12 +27,11 @@ public class HiddenMagic
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-
+        MagicTypes.initialize();
     }
 
     @EventHandler
     public void postInit(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register( new ModEvents() );
-        BlockExtensions.initialize();
     }
 }

@@ -6,6 +6,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class WorldExtension<T> {
     private BlockExtension<T> blockExtension;
@@ -49,12 +51,26 @@ public class WorldExtension<T> {
     public void set(BlockPos pos, T value, boolean loading) {
         ChunkPos chunkPos = new ChunkPos(pos);
         ChunkExtension<T> chunkExtension = getChunkExtension(chunkPos, true);
+
         if (!loading) {
             Chunk chunk = world.getChunkFromChunkCoords(chunkPos.x, chunkPos.z);
             chunk.markDirty();
         }
-        chunkExtension.put(pos, value);
-        if (value == null && chunkExtension.size() == 0)
-            chunkExtensions.remove(chunkPos);
+
+        boolean remove = blockExtension.defaultValue().equals(value);
+        if (remove) {
+            chunkExtension.remove(pos);
+            if (chunkExtension.size() == 0)
+                chunkExtensions.remove(chunkPos);
+        } else {
+            chunkExtension.put(pos, value);
+        }
+    }
+
+    public Set<BlockPos> getActive(ChunkPos pos) {
+        ChunkExtension ce = chunkExtensions.get(pos);
+        if (ce == null)
+            return new HashSet<>();
+        return ce.keySet();
     }
 }

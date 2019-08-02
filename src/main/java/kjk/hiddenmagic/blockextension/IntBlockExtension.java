@@ -5,12 +5,11 @@ import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class BELifeMagic extends BlockExtension<Integer> {
+public class IntBlockExtension extends BlockExtension<Integer> {
 
-    @Override
-    public String name() {
-        return "Life Magic";
-    }
+    public IntBlockExtension(String name) { super(name); }
+
+    public int min() { return 0; }
 
     @Override
     protected NBTBase toNBT(Integer value) {
@@ -24,7 +23,8 @@ public class BELifeMagic extends BlockExtension<Integer> {
 
     public void add(World world, BlockPos pos, int amount) {
         WorldExtension<Integer> we = getWorldExtension(world);
-        we.set(pos, we.get(pos) + amount);
+        int newAmount = Math.max(we.get(pos) + amount, min());
+        we.set(pos, newAmount);
     }
 
     @Override

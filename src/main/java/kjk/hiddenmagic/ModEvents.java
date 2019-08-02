@@ -1,10 +1,11 @@
 package kjk.hiddenmagic;
 
-import kjk.hiddenmagic.blockextension.BlockExtensions;
 import kjk.hiddenmagic.blockextension.WorldExtension;
 import kjk.hiddenmagic.common.CMath;
 import kjk.hiddenmagic.common.CWorld;
 import kjk.hiddenmagic.common.Common;
+import kjk.hiddenmagic.flow.Flow2;
+import kjk.hiddenmagic.magictype.MagicType;
 import kjk.hiddenmagic.magictype.MagicTypes;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -12,8 +13,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
@@ -24,21 +27,20 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import java.util.Iterator;
 
 public class ModEvents {
-    int updateLCG = 1;
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent event) {
         World world = event.world;
+        randomUpdate(world);
+//        Flow2.flow(world, MagicTypes.LIFE);
+    }
 
-        Iterator<Chunk> chunks = null;
-        try {
-            chunks = Common.getTickableChunks(world);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    int updateLCG = 1;
+    void randomUpdate(World world) {
+        Iterator<Chunk> chunks = Common.getTickableChunks(world);
         if (chunks == null)
             return;
 
+        int randomTickSpeed = world.getGameRules().getInt("randomTickSpeed");
         chunks.forEachRemaining((Chunk chunk) -> {
             int x = chunk.x * 16;
             int z = chunk.z * 16;
@@ -47,7 +49,7 @@ public class ModEvents {
             {
                 if (storage != Chunk.NULL_BLOCK_STORAGE)
                 {
-                    for (int i = 0; i < 3; i++)
+                    for (int i = 0; i < randomTickSpeed; i++)
                     {
                         this.updateLCG = this.updateLCG * 3 + 1013904223;
                         int magic = this.updateLCG >> 2;
@@ -82,36 +84,48 @@ public class ModEvents {
             }
         }
         MagicTypes.LIFE.flowInto(world, pos, light / 27);
+//        MagicTypes.LIFE.add(world, pos, light / 27 );
     }
 
     @SubscribeEvent
     public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         World world = event.getWorld();
-        if (world.isRemote)
-            return;
+
         EntityPlayer player = event.getEntityPlayer();
         ItemStack stack = event.getItemStack();
         if (stack.getItem() != Items.STICK)
             return;
+
         BlockPos pos = event.getPos();
+        WorldExtension<Integer> we = MagicTypes.LIFE.field.getWorldExtension(world);
+        int magic = MagicTypes.LIFE.field.get(world, pos);
 
-        WorldExtension<Integer> we = BlockExtensions.LIFE_MAGIC.getWorldExtension(world);
-        int magic = we.get(pos);
+//        we.clear();
 
-        double activation = Math.log(magic + 1);
+//        double activation = Math.sqrt(magic) / 10;
+        double activation = MagicTypes.LIFE.field.get(world, pos) /
+                Math.sqrt(MagicTypes.LIFE.capacity(world, pos));
         for (int i = 0; i < activation; i++) {
-            double vx = CMath.rand.nextGaussian() * 0.02D;
-            double vy = CMath.rand.nextGaussian() * 0.02D;
-            double vz = CMath.rand.nextGaussian() * 0.02D;
+            double vx = CMath.rand.nextGaussian() * 0.06D;
+            double vy = CMath.rand.nextGaussian() * 0.06D;
+            double vz = CMath.rand.nextGaussian() * 0.06D;
+            BlockPos pos2 = pos.offset(event.getFace());
             world.spawnParticle(
                     EnumParticleTypes.VILLAGER_HAPPY,
-                    (double)((float)pos.getX() + CMath.rand.nextFloat()),
-                    (double)pos.getY() + (double)CMath.rand.nextFloat(),
-                    (double)((float)pos.getZ() + CMath.rand.nextFloat()),
+                    (double)((float)pos2.getX() + CMath.rand.nextFloat()),
+                    (double)pos2.getY() + (double)CMath.rand.nextFloat(),
+                    (double)((float)pos2.getZ() + CMath.rand.nextFloat()),
                     vx, vy, vz);
         }
 
-        Common.message(player, Integer.toString(magic));
+        event.setCanceled(true);
+        event.setCancellationResult(EnumActionResult.SUCCESS);
+
+        if (world.isRemote)
+            return;
+
+        System.out.println("Magic level = " + Integer.toString(magic));
+//        Common.message(player, Integer.toString(magic));
 //        we.set(pos, ++magic);
     }
 }
