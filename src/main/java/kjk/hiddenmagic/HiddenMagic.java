@@ -8,10 +8,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
-
 @Mod(modid = HiddenMagic.MODID, name = HiddenMagic.NAME, version = HiddenMagic.VERSION)
-public class HiddenMagic
-{
+public class HiddenMagic {
     public static final String MODID = "hiddenmagic";
     public static final String NAME = "Hidden Magic";
     public static final String VERSION = "1.0";
@@ -19,19 +17,17 @@ public class HiddenMagic
     private static Logger logger;
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
+    public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
     }
 
     @EventHandler
-    public void init(FMLInitializationEvent event)
-    {
+    public void init(FMLInitializationEvent event) {
         MagicTypes.initialize();
     }
 
     @EventHandler
     public void postInit(FMLInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register( new ModEvents() );
+        MinecraftForge.EVENT_BUS.register(new ModEvents());
     }
 }

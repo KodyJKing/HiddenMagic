@@ -23,7 +23,7 @@ public class Flow2 {
 
         // Todo: Randomize order so there is no directional bias.
         chunks.forEachRemaining((Chunk chunk) -> {
-            for (BlockPos pos: type.field.getActive(world, chunk.getPos()))
+            for (BlockPos pos: type.getActive(world, chunk.getPos()))
                 equalize(world, pos, type, flow);
         });
 
@@ -39,7 +39,7 @@ public class Flow2 {
         for (EnumFacing dir: EnumFacing.values())
             netCapacity += type.remainingCapacity(world, pos.offset(dir));
 
-        int magic = type.field.get(world, pos);
+        int magic = type.get(world, pos);
         int magicLeft = magic;
         for (EnumFacing dir: EnumFacing.values()) {
             BlockPos pos2 = pos.offset(dir);

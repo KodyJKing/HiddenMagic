@@ -16,10 +16,10 @@ public class MagicLife extends MagicType {
 
     public MagicLife(String name) {
         super(name);
-        capacities.put(Blocks.LEAVES, 4);
-        capacities.put(Blocks.LOG, 8);
-        capacities.put(Blocks.LOG2, 8);
-        capacities.put(Blocks.MELON_BLOCK, 2048);
+        capacities.put(Blocks.LEAVES, 16);
+        capacities.put(Blocks.LOG, 32);
+        capacities.put(Blocks.LOG2, 32);
+        capacities.put(Blocks.MELON_BLOCK, 8192);
     }
 
     @Override

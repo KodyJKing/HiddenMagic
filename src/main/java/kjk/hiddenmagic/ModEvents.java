@@ -31,7 +31,7 @@ public class ModEvents {
     public void onWorldTick(TickEvent.WorldTickEvent event) {
         World world = event.world;
         randomUpdate(world);
-//        Flow2.flow(world, MagicTypes.LIFE);
+        Flow2.flow(world, MagicTypes.LIFE);
     }
 
     int updateLCG = 1;
@@ -83,8 +83,8 @@ public class ModEvents {
                 }
             }
         }
-        MagicTypes.LIFE.flowInto(world, pos, light / 27);
-//        MagicTypes.LIFE.add(world, pos, light / 27 );
+//        MagicTypes.LIFE.flowInto(world, pos, light / 27);
+        MagicTypes.LIFE.add(world, pos, light * 4 / 27 );
     }
 
     @SubscribeEvent
@@ -97,14 +97,12 @@ public class ModEvents {
             return;
 
         BlockPos pos = event.getPos();
-        WorldExtension<Integer> we = MagicTypes.LIFE.field.getWorldExtension(world);
-        int magic = MagicTypes.LIFE.field.get(world, pos);
+        int magic = MagicTypes.LIFE.get(world, pos);
 
 //        we.clear();
 
 //        double activation = Math.sqrt(magic) / 10;
-        double activation = MagicTypes.LIFE.field.get(world, pos) /
-                Math.sqrt(MagicTypes.LIFE.capacity(world, pos));
+        double activation = MagicTypes.LIFE.get(world, pos) / Math.sqrt(MagicTypes.LIFE.capacity(world, pos)) / 4;
         for (int i = 0; i < activation; i++) {
             double vx = CMath.rand.nextGaussian() * 0.06D;
             double vy = CMath.rand.nextGaussian() * 0.06D;

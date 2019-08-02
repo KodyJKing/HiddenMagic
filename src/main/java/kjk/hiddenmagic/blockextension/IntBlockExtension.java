@@ -22,9 +22,13 @@ public class IntBlockExtension extends BlockExtension<Integer> {
     }
 
     public void add(World world, BlockPos pos, int amount) {
-        WorldExtension<Integer> we = getWorldExtension(world);
-        int newAmount = Math.max(we.get(pos) + amount, min());
-        we.set(pos, newAmount);
+        set(world, pos, amount + get(world, pos));
+    }
+
+    @Override
+    public void set(World world, BlockPos pos, Integer value) {
+        value = Math.max(value, min());
+        super.set(world, pos, value);
     }
 
     @Override
