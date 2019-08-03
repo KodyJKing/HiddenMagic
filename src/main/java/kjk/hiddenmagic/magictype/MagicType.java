@@ -51,6 +51,8 @@ public abstract class MagicType {
         return field.get(world, pos) / (double) capacity(world, pos);
     }
 
+    public double vacuum(World world, BlockPos pos) { return 1 - pressure(world, pos); }
+
     public Set<BlockPos> getActive(World world, ChunkPos pos) {
         return field.getActive(world, pos);
     }
@@ -73,7 +75,9 @@ public abstract class MagicType {
     }
 
     private void markDirty(World world, BlockPos pos) {
-        dirty.get(world);
+        int dimension = world.provider.getDimension();
+        Set<BlockPos> positions = dirty.get(dimension);
+
     }
 
 }

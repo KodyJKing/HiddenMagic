@@ -9,6 +9,7 @@ import net.minecraft.world.chunk.Chunk;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.function.Function;
 
 public class Flow2 {
 
@@ -35,15 +36,21 @@ public class Flow2 {
     }
 
     public static void equalize(World world, BlockPos pos, MagicType type, Flow flow) {
-        int netCapacity = type.capacity(world, pos);
+
+        Function<BlockPos, Double> getShare = (BlockPos _pos) -> (double) type.capacity(world, _pos);
+
+        double netShare = getShare.apply(pos);
+//        double netShare = type.capacity(world, pos);
         for (EnumFacing dir: EnumFacing.values())
-            netCapacity += type.remainingCapacity(world, pos.offset(dir));
+            netShare += getShare.apply(pos.offset(dir));
+//            netShare += type.remainingCapacity(world, pos.offset(dir));
 
         int magic = type.get(world, pos);
         int magicLeft = magic;
         for (EnumFacing dir: EnumFacing.values()) {
             BlockPos pos2 = pos.offset(dir);
-            double share = type.remainingCapacity(world, pos2) / (double) netCapacity;
+            double share = getShare.apply(pos2) / netShare;
+//            double share = type.remainingCapacity(world, pos2) / netShare;
             int amount = (int) Math.floor(magic * share);
             amount = addFlow(world, pos2, amount, type, flow);
             magicLeft -= amount;
