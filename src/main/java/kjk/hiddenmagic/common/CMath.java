@@ -1,5 +1,6 @@
 package kjk.hiddenmagic.common;
 
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -50,6 +51,26 @@ public class CMath {
         dz *= r;
 
         return new double[] {dx, dy, dz};
+    }
+
+    public static double lerp(double a, double b, double amount) {
+        return a * (1 - amount) + b * amount;
+    }
+
+    public static double clamp(double x, double min, double max) {
+        if (x < min) return min;
+        if (x > max) return max;
+        return x;
+    }
+
+    public static <T> void shuffle(List<T> list) {
+        for (int i = 0; i < list.size(); i++) {
+            int j = i + rand.nextInt(list.size() - i);
+
+            T tmp = list.get(i);
+            list.set(i, list.get(j));
+            list.set(j, tmp);
+        }
     }
 
 }

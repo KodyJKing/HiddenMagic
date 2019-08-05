@@ -43,9 +43,13 @@ public abstract class BlockExtension<T> {
         return we;
     }
 
-    public Set<BlockPos> getActive(World world, ChunkPos pos) {
+    public void clear() {
+        worldExtensions.clear();
+    }
+
+    public Set<BlockPos> getKeys(World world, ChunkPos pos) {
         WorldExtension we = getWorldExtension(world);
-        return we.getActive(pos);
+        return we.getKeys(pos);
     }
 
     public T get(World world, BlockPos pos) {

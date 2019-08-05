@@ -9,10 +9,10 @@ import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class Flow {
+public class InstantFlow {
 
     public static int tryFlow(World world, BlockPos source, int amount, int maxDepth, boolean shareFlow, Set<Block> mediums, Set<Block> sinks, FlowHandler flowInto){
-        Flow flow = new Flow(world, source, maxDepth, mediums, sinks);
+        InstantFlow flow = new InstantFlow(world, source, maxDepth, mediums, sinks);
         ArrayList<BlockPos> sinkPositions = new ArrayList<>();
         while(true){
             BlockPos pos = flow.next();
@@ -23,7 +23,7 @@ public class Flow {
                 if (!shareFlow)
                     break;
         }
-        // TODO: Recalculate the share after flowing to each block to avoid waste. Flow to the blocks in a random order to avoid bias.
+        // TODO: Recalculate the share after flowing to each block to avoid waste. InstantFlow to the blocks in a random order to avoid bias.
         int share = sinkPositions.size() == 0 ? 0 : Math.max(amount / sinkPositions.size(), 1);
         for(BlockPos p: sinkPositions){
             if(amount < share)
@@ -45,7 +45,7 @@ public class Flow {
     private Set<Block> sinks;
     private int depth = 0;
 
-    public Flow(World world, BlockPos source, int maxDepth, Set<Block> mediums, Set<Block> sinks){
+    public InstantFlow(World world, BlockPos source, int maxDepth, Set<Block> mediums, Set<Block> sinks){
         this.world = world;
         this.maxDepth = maxDepth;
         this.mediums = mediums;

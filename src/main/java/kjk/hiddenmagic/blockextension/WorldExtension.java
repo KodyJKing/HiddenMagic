@@ -67,7 +67,7 @@ public class WorldExtension<T> {
         }
     }
 
-    public Set<BlockPos> getActive(ChunkPos pos) {
+    public Set<BlockPos> getKeys(ChunkPos pos) {
         ChunkExtension ce = chunkExtensions.get(pos);
         if (ce == null)
             return new HashSet<>();

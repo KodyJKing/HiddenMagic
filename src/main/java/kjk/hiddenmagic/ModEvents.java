@@ -1,11 +1,8 @@
 package kjk.hiddenmagic;
 
-import kjk.hiddenmagic.blockextension.WorldExtension;
 import kjk.hiddenmagic.common.CMath;
 import kjk.hiddenmagic.common.CWorld;
 import kjk.hiddenmagic.common.Common;
-import kjk.hiddenmagic.flow.Flow2;
-import kjk.hiddenmagic.magictype.MagicType;
 import kjk.hiddenmagic.magictype.MagicTypes;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -16,22 +13,35 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.Iterator;
 
 public class ModEvents {
+
+    static long lastTick = 0;
+    static double tickLength = 0;
+    static int msgTimer0 = 0;
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent event) {
         World world = event.world;
         randomUpdate(world);
-        Flow2.flow(world, MagicTypes.LIFE);
+        MagicTypes.LIFE.update(world);
+
+//        long time = System.currentTimeMillis();
+//        long dt = time - lastTick;
+//        tickLength = dt * 0.1 + tickLength * 0.9;
+//        lastTick = time;
+//        if (msgTimer0++ % 20 == 0)
+//            System.out.println(
+//                    String.format("Tick length: %.2f", tickLength)
+//            );
     }
 
     int updateLCG = 1;
@@ -62,7 +72,7 @@ public class ModEvents {
                         IBlockState bs = storage.get(dx, dy, dz);
                         Block block = bs.getBlock();
 
-                        if (block instanceof BlockLeaves)
+                        if (block instanceof BlockLog)
                             tickLeaves(world, pos);
 
                     }
@@ -74,17 +84,17 @@ public class ModEvents {
 
     void tickLeaves(World world, BlockPos pos) {
         int light = 0;
-        for(int x = -1; x <= 1; x++){
-            for(int y = -1; y <= 1; y++){
-                for(int z = -1; z <= 1; z++) {
+        for(int x = -2; x <= 2; x++){
+            for(int y = -2; y <= 2; y++){
+                for(int z = -2; z <= 2; z++) {
                     BlockPos p = pos.add(x, y, z);
                     if (world.getBlockState(p).getMaterial() == Material.LEAVES)
                         light += CWorld.skyLight(world, p);
                 }
             }
         }
-//        MagicTypes.LIFE.flowInto(world, pos, light / 27);
-        MagicTypes.LIFE.add(world, pos, light * 4 / 27 );
+//        MagicTypes.LIFE.add(world, pos, light / 27);
+        MagicTypes.LIFE.add(world, pos, light);
     }
 
     @SubscribeEvent
@@ -96,13 +106,20 @@ public class ModEvents {
         if (stack.getItem() != Items.STICK)
             return;
 
+//        if (player.isSneaking()) {
+//            if (world.isRemote) {
+//                System.out.println("Clearing life magic.");
+//                MagicTypes.LIFE.clear();
+//            }
+//            return;
+//        }
+
         BlockPos pos = event.getPos();
         int magic = MagicTypes.LIFE.get(world, pos);
 
-//        we.clear();
-
-//        double activation = Math.sqrt(magic) / 10;
         double activation = MagicTypes.LIFE.get(world, pos) / Math.sqrt(MagicTypes.LIFE.capacity(world, pos)) / 4;
+        activation = Math.max(0, activation);
+        activation = Math.min(100, activation);
         for (int i = 0; i < activation; i++) {
             double vx = CMath.rand.nextGaussian() * 0.06D;
             double vy = CMath.rand.nextGaussian() * 0.06D;
@@ -123,7 +140,10 @@ public class ModEvents {
             return;
 
         System.out.println("Magic level = " + Integer.toString(magic));
-//        Common.message(player, Integer.toString(magic));
-//        we.set(pos, ++magic);
+    }
+
+    @SubscribeEvent
+    public void onPlaceBlock(BlockEvent.NeighborNotifyEvent event) {
+        MagicTypes.LIFE.notifyChange(event.getWorld(), event.getPos());
     }
 }
