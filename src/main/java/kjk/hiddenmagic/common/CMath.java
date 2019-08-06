@@ -63,6 +63,13 @@ public class CMath {
         return x;
     }
 
+    public static int clamp(int x, int min, int max) {
+        if (x < min) return min;
+        if (x > max) return max;
+        return x;
+    }
+
+
     public static <T> void shuffle(List<T> list) {
         for (int i = 0; i < list.size(); i++) {
             int j = i + rand.nextInt(list.size() - i);

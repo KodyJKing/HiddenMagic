@@ -11,10 +11,11 @@ public class MagicLife extends MagicType {
 
     public MagicLife(String name) {
         super(name);
-//        capacities.put(Blocks.LEAVES, 16);
         capacities.put(Blocks.LOG, 32);
         capacities.put(Blocks.LOG2, 32);
         capacities.put(Blocks.MELON_BLOCK, 8192);
+        capacities.put(Blocks.PUMPKIN, 8192);
+        capacities.put(Blocks.CACTUS, 1024);
     }
 
     @Override
@@ -25,6 +26,17 @@ public class MagicLife extends MagicType {
             if (dir.equals(EnumFacing.DOWN))
                 return in ? 0 : 1;
         }
+
+        if (bs.getBlock() == Blocks.PUMPKIN) {
+            if (dir.equals(EnumFacing.DOWN))
+                return in ? 1 : 0;
+            if (dir.equals(EnumFacing.UP))
+                return in ? 0 : 1;
+        }
+
+        if (bs.getBlock() == Blocks.CACTUS && !in)
+            return dir == EnumFacing.DOWN ? 1 : 0;
+
         return 1;
     }
 }

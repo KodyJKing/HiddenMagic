@@ -1,6 +1,9 @@
 package kjk.hiddenmagic.magictype;
 
+import kjk.hiddenmagic.blockbehaviour.BlockBehaviour;
+import kjk.hiddenmagic.blockbehaviour.BlockBehaviours;
 import kjk.hiddenmagic.blockextension.IntBlockExtension;
+import kjk.hiddenmagic.common.CMath;
 import kjk.hiddenmagic.common.Common;
 import kjk.hiddenmagic.common.DefaultMap;
 import kjk.hiddenmagic.flow.ManaFlow;
@@ -30,6 +33,8 @@ public abstract class MagicType {
 
     public DefaultMap<Integer, Set<BlockPos>> dirty = new DefaultMap<>(HashSet::new);
 
+    public Set<BlockPos> tick = new HashSet<>();
+
     public MagicType(String name) {
         this.name = name;
         id = idCounter++;
@@ -42,17 +47,37 @@ public abstract class MagicType {
         return field.get(world, pos);
     }
 
-    public void set(World world, BlockPos pos, Integer value) {
+    public int set(World world, BlockPos pos, Integer value) {
         int oldValue = field.get(world, pos);
-        value = Math.min(value, capacity(world, pos));
-        field.set(world, pos, value);
-        if (oldValue != value)
+
+        int clamped = CMath.clamp(value, 0, capacity(world, pos));
+        field.set(world, pos, clamped);
+
+        if (BlockBehaviours.consumesMagic(world, pos, this)) {
+            if (clamped > 0)
+                tick.add(pos);
+            else
+                tick.remove(pos);
+        }
+
+        if (oldValue != clamped)
             markDirty(world, pos);
+
+        return value - clamped;
     }
 
-    public void add(World world, BlockPos pos, int amount) {
+    public int add(World world, BlockPos pos, int amount) {
         amount += field.get(world, pos);
-        set(world, pos, amount);
+        return set(world, pos, amount);
+    }
+
+    public boolean consume(World world, BlockPos pos, int amount) {
+        int magic = get(world, pos);
+        if (magic >= amount) {
+            add(world, pos, -amount);
+            return true;
+        }
+        return false;
     }
 
     public void clear() {
@@ -60,17 +85,17 @@ public abstract class MagicType {
     }
 
     public int capacity(World world, BlockPos pos) {
-        Block block = world.getBlockState(pos).getBlock();
-        Integer result = capacities.get(block);
-        return result == null ? 0 : result;
+//        Block block = world.getBlockState(pos).getBlock();
+//        Integer result = capacities.get(block);
+//        return result == null ? 0 : result;
+        BlockBehaviour bb = BlockBehaviours.get(world, pos);
+        return bb != null ? bb.capacity(this) : 0;
     }
 
     public int conductance(World world, BlockPos pos, EnumFacing dir, boolean in) {
-        return conductance(world.getBlockState(pos), dir, in);
-    }
-
-    public int conductance(IBlockState blockState, EnumFacing dir, boolean in) {
-        return 1;
+//        return conductance(world.getBlockState(pos), dir, in);
+        BlockBehaviour bb = BlockBehaviours.get(world, pos);
+        return bb != null ? bb.conductance(world, pos, dir, in, this) : 0;
     }
 
     public Set<BlockPos> getKeys(World world, ChunkPos pos) {
@@ -82,6 +107,8 @@ public abstract class MagicType {
     public void notifyChange(World world, BlockPos pos) {
         if (capacity(world, pos) > 0)
             markDirty(world, pos);
+        else
+            set(world, pos, 0);
     }
 
     private void markDirty(World world, BlockPos pos) {
@@ -129,6 +156,10 @@ public abstract class MagicType {
         Set<BlockPos> active = getActive(world);
         dirty.clear();
         ManaFlow.flow(world, this, active);
+        HashSet<BlockPos> currentTick = new HashSet<>();
+        currentTick.addAll(tick);
+        for (BlockPos tickPos: currentTick)
+            BlockBehaviours.magicTick(world, tickPos, this);
     }
 
 }

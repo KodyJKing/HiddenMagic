@@ -1,5 +1,7 @@
 package kjk.hiddenmagic;
 
+import kjk.hiddenmagic.blockbehaviour.BlockBehaviour;
+import kjk.hiddenmagic.blockbehaviour.BlockBehaviours;
 import kjk.hiddenmagic.magictype.MagicTypes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -24,6 +26,7 @@ public class HiddenMagic {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         MagicTypes.initialize();
+        BlockBehaviours.initialize();
     }
 
     @EventHandler

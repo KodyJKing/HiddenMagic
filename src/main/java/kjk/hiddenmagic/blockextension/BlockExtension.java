@@ -56,9 +56,7 @@ public abstract class BlockExtension<T> {
         return getWorldExtension(world).get(pos);
     }
 
-    public void set(World world, BlockPos pos, T value) {
-        getWorldExtension(world).set(pos, value);
-    }
+    public void set(World world, BlockPos pos, T value) { getWorldExtension(world).set(pos, value); }
 
     public BlockExtension(String name) {
         this.name = name;

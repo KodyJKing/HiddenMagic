@@ -21,19 +21,19 @@ public class ManaFlow {
         for (BlockPos pos: activeList)
             flowAt(world, pos, type);
 
-        if (msgTimer0++ % 20 == 0) {
-            System.out.println(type.name + " updates: " + activeList.size());
-
-            HashMap<String, Integer> counts = new HashMap<>();
-            for (BlockPos pos: active) {
-                Block block = world.getBlockState(pos).getBlock();
-                String name = block.getLocalizedName();
-                int amount = counts.getOrDefault(name, 0) + 1;
-                counts.put(name, amount);
-            }
-
-            System.out.println(counts);
-        }
+//        if (msgTimer0++ % 20 == 0) {
+//            System.out.println(type.name + " updates: " + activeList.size());
+//
+//            HashMap<String, Integer> counts = new HashMap<>();
+//            for (BlockPos pos: active) {
+//                Block block = world.getBlockState(pos).getBlock();
+//                String name = block.getLocalizedName();
+//                int amount = counts.getOrDefault(name, 0) + 1;
+//                counts.put(name, amount);
+//            }
+//
+//            System.out.println(counts);
+//        }
 
     }
 

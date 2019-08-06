@@ -1,13 +1,17 @@
 package kjk.hiddenmagic;
 
+import kjk.hiddenmagic.blockbehaviour.BlockBehaviour;
+import kjk.hiddenmagic.blockbehaviour.BlockBehaviours;
 import kjk.hiddenmagic.common.CMath;
 import kjk.hiddenmagic.common.CWorld;
 import kjk.hiddenmagic.common.Common;
+import kjk.hiddenmagic.flow.InstantFlow;
 import kjk.hiddenmagic.magictype.MagicTypes;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -21,7 +25,9 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class ModEvents {
 
@@ -51,7 +57,7 @@ public class ModEvents {
             return;
 
         int randomTickSpeed = world.getGameRules().getInt("randomTickSpeed");
-        chunks.forEachRemaining((Chunk chunk) -> {
+        chunks.forEachRemaining((chunk) -> {
             int x = chunk.x * 16;
             int z = chunk.z * 16;
 
@@ -66,35 +72,13 @@ public class ModEvents {
                         int dx = magic & 15;
                         int dz = magic >> 8 & 15;
                         int dy = magic >> 16 & 15;
-
                         BlockPos pos = new BlockPos(dx + x, dy + storage.getYLocation(), dz + z);
-
-                        IBlockState bs = storage.get(dx, dy, dz);
-                        Block block = bs.getBlock();
-
-                        if (block instanceof BlockLog)
-                            tickLeaves(world, pos);
-
+                        BlockBehaviours.randomTick(world, pos);
                     }
                 }
             }
 
         });
-    }
-
-    void tickLeaves(World world, BlockPos pos) {
-        int light = 0;
-        for(int x = -2; x <= 2; x++){
-            for(int y = -2; y <= 2; y++){
-                for(int z = -2; z <= 2; z++) {
-                    BlockPos p = pos.add(x, y, z);
-                    if (world.getBlockState(p).getMaterial() == Material.LEAVES)
-                        light += CWorld.skyLight(world, p);
-                }
-            }
-        }
-//        MagicTypes.LIFE.add(world, pos, light / 27);
-        MagicTypes.LIFE.add(world, pos, light);
     }
 
     @SubscribeEvent
@@ -106,13 +90,14 @@ public class ModEvents {
         if (stack.getItem() != Items.STICK)
             return;
 
-//        if (player.isSneaking()) {
-//            if (world.isRemote) {
-//                System.out.println("Clearing life magic.");
-//                MagicTypes.LIFE.clear();
-//            }
-//            return;
-//        }
+        boolean shiftClickClears = false;
+        if (shiftClickClears && player.isSneaking()) {
+            if (world.isRemote) {
+                System.out.println("Clearing life magic.");
+                MagicTypes.LIFE.clear();
+            }
+            return;
+        }
 
         BlockPos pos = event.getPos();
         int magic = MagicTypes.LIFE.get(world, pos);
