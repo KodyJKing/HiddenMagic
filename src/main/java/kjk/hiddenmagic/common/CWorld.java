@@ -1,9 +1,12 @@
 package kjk.hiddenmagic.common;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class CWorld {
 
@@ -19,6 +22,11 @@ public class CWorld {
         }
 
         return MathHelper.clamp(i, 0, 15);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static World playerWorld() {
+        return Minecraft.getMinecraft().world;
     }
 
 }

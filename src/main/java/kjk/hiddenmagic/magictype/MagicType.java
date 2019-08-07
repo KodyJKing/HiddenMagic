@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public abstract class MagicType {
+public class MagicType {
 
     private static int idCounter = 0;
 
@@ -85,9 +85,6 @@ public abstract class MagicType {
     }
 
     public int capacity(World world, BlockPos pos) {
-//        Block block = world.getBlockState(pos).getBlock();
-//        Integer result = capacities.get(block);
-//        return result == null ? 0 : result;
         BlockBehaviour bb = BlockBehaviours.get(world, pos);
         return bb != null ? bb.capacity(this) : 0;
     }
@@ -112,7 +109,7 @@ public abstract class MagicType {
     }
 
     private void markDirty(World world, BlockPos pos) {
-        Set<BlockPos> positions = dirty.get(world.provider.getDimension());
+        Set<BlockPos> positions = dirty.getOrCreate(world.provider.getDimension());
         positions.add(pos);
     }
 
@@ -134,7 +131,7 @@ public abstract class MagicType {
             justLoaded = false;
             return getTickable(world);
         }
-        return dirty.get(world.provider.getDimension());
+        return dirty.getOrCreate(world.provider.getDimension());
     }
 
     private Set<BlockPos> getActive(World world) {

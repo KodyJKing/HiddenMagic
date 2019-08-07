@@ -1,21 +1,11 @@
 package kjk.hiddenmagic.blockbehaviour;
 
-import kjk.hiddenmagic.common.CMath;
-import kjk.hiddenmagic.common.CWorld;
-import kjk.hiddenmagic.common.Common;
 import kjk.hiddenmagic.common.DefaultMap;
-import kjk.hiddenmagic.flow.InstantFlow;
 import kjk.hiddenmagic.magictype.MagicType;
 import kjk.hiddenmagic.magictype.MagicTypes;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -37,7 +27,7 @@ public class BlockBehaviours {
     }
 
     static void add(Block block, int meta, BlockBehaviour behaviour) {
-        behaviours.get(block).add(new Entry(behaviour, meta));
+        behaviours.getOrCreate(block).add(new Entry(behaviour, meta));
     }
 
     static void add(Block block, BlockBehaviour behaviour) {
@@ -50,11 +40,14 @@ public class BlockBehaviours {
     }
 
     public static BlockBehaviour get(IBlockState bs) {
-        for (Entry entry: behaviours.get(bs.getBlock())) {
-            int behaviourMeta = entry.meta;
-            int blockMeta = bs.getBlock().getMetaFromState(bs);
-            if (behaviourMeta == -1 || behaviourMeta == blockMeta)
-                return entry.behaviour;
+        List<Entry> entries = behaviours.get(bs.getBlock());
+        if (entries != null) {
+            for (Entry entry: entries) {
+                int behaviourMeta = entry.meta;
+                int blockMeta = bs.getBlock().getMetaFromState(bs);
+                if (behaviourMeta == -1 || behaviourMeta == blockMeta)
+                    return entry.behaviour;
+            }
         }
         return null;
     }
@@ -80,78 +73,19 @@ public class BlockBehaviours {
         BlockBehaviour bb = get(world, pos);
         if (bb != null)
             bb.magicTick(world, pos, type);
-    }
+}
 
     // Content
 
     public static void initialize() {
-
-        BlockBehaviour LEAVES = new BlockBehaviour() {
-            @Override
-            public void randomTick(World world, BlockPos pos) {
-                int light = 0;
-                for(int x = -2; x <= 2; x++){
-                    for(int y = -2; y <= 2; y++){
-                        for(int z = -2; z <= 2; z++) {
-                            BlockPos p = pos.add(x, y, z);
-                            if (world.getBlockState(p).getMaterial() == Material.LEAVES)
-                                light += CWorld.skyLight(world, p);
-                        }
-                    }
-                }
-
-                double lightFactor = 0.1;
-                InstantFlow.tryFlow(
-                        world, pos, (int) (light * lightFactor), 5, true,
-                        Common.set(Blocks.LEAVES, Blocks.LEAVES2),
-                        Common.set(Blocks.LOG, Blocks.LOG2),
-                        (world2, pos2, amount) -> MagicTypes.LIFE.add(world2, pos2, amount)
-                );
-            }
-        };
-
-        add(Blocks.LEAVES, LEAVES);
-        add(Blocks.LEAVES2, LEAVES);
-
-        BlockBehaviour LOG = new BlockBehaviour() {
-            @Override
-            public int capacity(MagicType type) {
-                return type == MagicTypes.LIFE ? 32 : 0;
-            }
-        };
-
-        add(Blocks.LOG, LOG);
-        add(Blocks.LOG2, LOG);
-
-        add(Blocks.CACTUS, new BlockBehaviour() {
-
-            @Override
-            public boolean consumesMagic(MagicType type) {
-                return type == MagicTypes.LIFE;
-            }
-
-            @Override
-            public void magicTick(World world, BlockPos pos, MagicType type) {
-                if (CMath.rand.nextFloat() > 0.025)
-                    return;
-
-                List<EntityLivingBase> entities = world.getEntitiesWithinAABB(
-                        EntityLivingBase.class, new AxisAlignedBB(pos).grow(5) );
-                EntityLivingBase entityToHurt = null;
-
-                for (EntityLivingBase entity: entities) {
-                    if (entity instanceof EntityPlayer && ((EntityPlayer) entity).capabilities.isCreativeMode)
-                        continue;
-                    if (entity.hurtResistantTime <= 0) {
-                        entityToHurt = entity;
-                        break;
-                    }
-                }
-
-                if (entityToHurt != null && type.consume(world, pos, 512))
-                        entityToHurt.attackEntityFrom(DamageSource.CACTUS, 8);
-            }
-        });
+        BlockBehaviour leavesBehaviour = new BehaviourLeaves();
+        add(Blocks.LEAVES, leavesBehaviour);
+        add(Blocks.LEAVES2, leavesBehaviour);
+        BlockBehaviour logBehaviour = new BlockBehaviour().setCapacity(MagicTypes.LIFE, 32);
+        add(Blocks.LOG, logBehaviour);
+        add(Blocks.LOG2, logBehaviour);
+        add(Blocks.MELON_BLOCK, new BehaviourBattery(true));
+        add(Blocks.PUMPKIN, new BehaviourBattery(false));
+        add(Blocks.CACTUS, new BehaviourCactus());
     }
-
 }

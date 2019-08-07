@@ -6,19 +6,19 @@ import java.util.Random;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 public class CMath {
 
     public static Random rand = new Random();
 
-    public static double[] randVec(double mag){
+    public static Vec3d randVec(double mag){
         double x, y, z;
         x = rand.nextGaussian();
         y = rand.nextGaussian();
         z = rand.nextGaussian();
         mag /= Math.sqrt(x * x + y * y + z * z);
-        double[] result = {x * mag, y * mag, z * mag};
-        return result;
+        return new Vec3d(x * mag, y * mag, z * mag);
     }
 
     public static BlockPos randNeighbor(BlockPos pos){
@@ -78,6 +78,22 @@ public class CMath {
             list.set(i, list.get(j));
             list.set(j, tmp);
         }
+    }
+
+    public static Vec3d lerp(Vec3d a, Vec3d b, double amount) {
+        return a.scale(1 - amount).add(b.scale(amount));
+    }
+
+    public static double easeCubic(double x) {
+        return 3 * x * x - 2 * x * x * x;
+    }
+
+    public static double phaseQuartic(double x) {
+        double y = x * 2;
+        double y4 = Math.pow(y, 4);
+        double y3 = Math.pow(y, 3);
+        double y2 = y * y;
+        return y4 - 4 * y3 + 4 * y2;
     }
 
 }

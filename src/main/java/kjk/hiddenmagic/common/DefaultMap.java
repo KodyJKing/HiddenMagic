@@ -12,14 +12,13 @@ public class DefaultMap<K, T> extends HashMap<K, T> {
         this.getDefault = getDefault;
     }
 
-    @Override
-    public T get(Object key) {
+    public T getOrCreate(Object key) {
         try {
             if (!containsKey(key))
                 put((K) key, getDefault.get());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return super.get(key);
+        return get(key);
     }
 }

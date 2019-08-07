@@ -1,5 +1,6 @@
 package kjk.hiddenmagic.common;
 
+import com.google.gson.Gson;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
@@ -12,6 +13,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class Common {
+
+    public static Gson gson = new Gson();
+
     public static Iterator<Chunk> getTickableChunks(World world) {
         try {
             WorldServer ws = world.getMinecraftServer().worlds[world.provider.getDimension()];

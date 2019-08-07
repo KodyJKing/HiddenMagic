@@ -6,13 +6,25 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
-public abstract class BlockBehaviour {
-    public boolean consumesMagic(MagicType type) { return false; }
+public class BlockBehaviour {
+
+    protected HashSet<MagicType> consumes = new HashSet<>();
+    public final BlockBehaviour setConsumes(MagicType type) {
+        consumes.add(type);
+        return this;
+    }
+    public final boolean consumesMagic(MagicType type) { return consumes.contains(type); }
+
     public void randomTick(World world, BlockPos pos) {}
     public void magicTick(World world, BlockPos pos, MagicType type) {}
 
-    private HashMap<MagicType, Integer> capacities = new HashMap<>();
-    public final int capacity(MagicType type) {  return capacities.get(type); }
+    protected HashMap<MagicType, Integer> capacities = new HashMap<>();
+    public final BlockBehaviour setCapacity(MagicType type, int value) {
+        capacities.put(type, value);
+        return this;
+    }
+    public final int capacity(MagicType type) {  return capacities.getOrDefault(type, 0); }
     public int conductance(World world, BlockPos pos, EnumFacing dir, boolean in, MagicType type) { return 1; }
 }

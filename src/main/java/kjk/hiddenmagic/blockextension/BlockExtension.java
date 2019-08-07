@@ -14,6 +14,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 public abstract class BlockExtension<T> {
@@ -33,7 +34,7 @@ public abstract class BlockExtension<T> {
         return HiddenMagic.MODID + "_" + name;
     }
 
-    public WorldExtension<T> getWorldExtension(World world) {
+    private WorldExtension<T> getWorldExtension(World world) {
         int dimension = world.provider.getDimension();
         WorldExtension<T> we = worldExtensions.get(dimension);
         if (we == null) {
@@ -49,7 +50,7 @@ public abstract class BlockExtension<T> {
 
     public Set<BlockPos> getKeys(World world, ChunkPos pos) {
         WorldExtension we = getWorldExtension(world);
-        return we.getKeys(pos);
+        return we == null ? new HashSet<>() : we.getKeys(pos);
     }
 
     public T get(World world, BlockPos pos) {
