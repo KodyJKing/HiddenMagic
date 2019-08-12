@@ -39,7 +39,7 @@ public class CMath {
         return pos;
     }
 
-    public static double[] lookVec(EntityPlayer player){
+    public static Vec3d lookVec(EntityPlayer player){
         float adjust = (float)Math.PI / 180.0F;
         float dx = -MathHelper.sin(player.rotationYaw * adjust);
         float dz = MathHelper.cos(player.rotationYaw * adjust);
@@ -50,7 +50,7 @@ public class CMath {
         dx *= r;
         dz *= r;
 
-        return new double[] {dx, dy, dz};
+        return new Vec3d(dx, dy, dz);
     }
 
     public static double lerp(double a, double b, double amount) {
@@ -88,7 +88,8 @@ public class CMath {
         return 3 * x * x - 2 * x * x * x;
     }
 
-    public static double phaseQuartic(double x) {
+    // https://www.wolframalpha.com/input/?i=(2x)%5E4-4(2x)%5E3%2B4(2x)%5E2
+    public static double bumpQuartic(double x) {
         double y = x * 2;
         double y4 = Math.pow(y, 4);
         double y3 = Math.pow(y, 3);

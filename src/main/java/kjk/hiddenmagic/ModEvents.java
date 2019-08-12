@@ -25,6 +25,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import javax.vecmath.GMatrix;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -101,10 +102,10 @@ public class ModEvents {
 
         BlockPos pos = event.getPos();
         int magic = MagicTypes.LIFE.get(world, pos);
+        int capacity = MagicTypes.LIFE.capacity(world, pos);
 
-        double activation = MagicTypes.LIFE.get(world, pos) / Math.sqrt(MagicTypes.LIFE.capacity(world, pos)) / 4;
-        activation = Math.max(0, activation);
-        activation = Math.min(100, activation);
+        double activation = (magic / (double) capacity) * Math.log10(capacity) * 3;
+        activation = CMath.clamp(activation, 0, 100);
         for (int i = 0; i < activation; i++) {
             double vx = CMath.rand.nextGaussian() * 0.06D;
             double vy = CMath.rand.nextGaussian() * 0.06D;

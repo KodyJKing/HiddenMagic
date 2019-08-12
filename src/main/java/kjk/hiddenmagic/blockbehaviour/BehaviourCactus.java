@@ -8,6 +8,7 @@ import kjk.hiddenmagic.network.Message;
 import kjk.hiddenmagic.network.Network;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -23,7 +24,7 @@ import java.util.Random;
 public class BehaviourCactus extends BlockBehaviour {
 
     public BehaviourCactus() {
-        setCapacity(MagicTypes.LIFE, 1024);
+        setCapacity(MagicTypes.LIFE, 10000);
         setConsumes(MagicTypes.LIFE);
     }
 
@@ -45,12 +46,17 @@ public class BehaviourCactus extends BlockBehaviour {
             }
         }
 
-        if (entityToHurt != null && type.consume(world, pos, 512)) {
+        if (entityToHurt != null && type.consume(world, pos, 10000)) {
             entityToHurt.attackEntityFrom(DamageSource.CACTUS, 8);
             Vec3d source = new Vec3d(pos).addVector(0.5, 0.5, 0.5);
             Vec3d target = entityToHurt.getPositionVector().addVector(0, entityToHurt.getEyeHeight(), 0);
-            Network.INSTANCE.sendToAllTracking(new Shock(source, target), entityToHurt);
+            Shock shock = new Shock(source, target);
+            Network.INSTANCE.sendToAllTracking(shock, entityToHurt);
+            if (entityToHurt instanceof EntityPlayerMP)
+                Network.INSTANCE.sendTo(shock, (EntityPlayerMP) entityToHurt);
 
+            Vec3d heading = target.subtract(source).normalize().scale(0.5);
+            entityToHurt.addVelocity(heading.x,0.25, heading.z);
         }
     }
 
@@ -73,12 +79,12 @@ public class BehaviourCactus extends BlockBehaviour {
             Vec3d offset = new Vec3d(0, 0, 0);
             for (int i = 0; i < numParticles; i++) {
                 double completion = i / (double) numParticles;
-                double phase = CMath.phaseQuartic(completion);
+                double bump = CMath.bumpQuartic(completion);
 
                 offset = offset.scale(0.9).add(CMath.randVec(0.2));
 
                 Vec3d lerp = CMath.lerp(source, target, completion);
-                Vec3d p = lerp.add(offset.scale(phase));
+                Vec3d p = lerp.add(offset.scale(bump));
 
                 world.spawnParticle(
                         EnumParticleTypes.SMOKE_NORMAL,

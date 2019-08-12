@@ -7,15 +7,12 @@ import kjk.hiddenmagic.common.CMath;
 import kjk.hiddenmagic.common.Common;
 import kjk.hiddenmagic.common.DefaultMap;
 import kjk.hiddenmagic.flow.ManaFlow;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -29,11 +26,9 @@ public class MagicType {
 
     private final IntBlockExtension field;
 
-    public final HashMap<Block, Integer> capacities = new HashMap<Block, Integer>();
-
     public DefaultMap<Integer, Set<BlockPos>> dirty = new DefaultMap<>(HashSet::new);
 
-    public Set<BlockPos> tick = new HashSet<>();
+    public Set<BlockPos> tickables = new HashSet<>();
 
     public MagicType(String name) {
         this.name = name;
@@ -55,9 +50,9 @@ public class MagicType {
 
         if (BlockBehaviours.consumesMagic(world, pos, this)) {
             if (clamped > 0)
-                tick.add(pos);
+                tickables.add(pos);
             else
-                tick.remove(pos);
+                tickables.remove(pos);
         }
 
         if (oldValue != clamped)
@@ -89,6 +84,10 @@ public class MagicType {
         return bb != null ? bb.capacity(this) : 0;
     }
 
+    public int room(World world, BlockPos pos) {
+        return capacity(world, pos) - get(world, pos);
+    }
+
     public int conductance(World world, BlockPos pos, EnumFacing dir, boolean in) {
 //        return conductance(world.getBlockState(pos), dir, in);
         BlockBehaviour bb = BlockBehaviours.get(world, pos);
@@ -113,7 +112,7 @@ public class MagicType {
         positions.add(pos);
     }
 
-    private Set<BlockPos> getTickable(World world) {
+    private Set<BlockPos> getKeys(World world) {
         HashSet<BlockPos> result = new HashSet<>();
         Iterator<Chunk> chunks = Common.getTickableChunks(world);
         if (chunks == null)
@@ -125,18 +124,9 @@ public class MagicType {
         return result;
     }
 
-    private boolean justLoaded = true;
-    private Set<BlockPos> getDirty(World world) {
-        if (justLoaded) {
-            justLoaded = false;
-            return getTickable(world);
-        }
-        return dirty.getOrCreate(world.provider.getDimension());
-    }
-
     private Set<BlockPos> getActive(World world) {
         HashSet<BlockPos> result = new HashSet<>();
-        for (BlockPos pos: getDirty(world)) {
+        for (BlockPos pos: dirty.getOrCreate(world.provider.getDimension())) {
             result.add(pos);
             for (EnumFacing dir: EnumFacing.values()) {
                 BlockPos pos2 = pos.offset(dir);
@@ -153,9 +143,10 @@ public class MagicType {
         Set<BlockPos> active = getActive(world);
         dirty.clear();
         ManaFlow.flow(world, this, active);
-        HashSet<BlockPos> currentTick = new HashSet<>();
-        currentTick.addAll(tick);
-        for (BlockPos tickPos: currentTick)
+        HashSet<BlockPos> currentTickables = new HashSet<>();
+        currentTickables.addAll(tickables);
+//        System.out.println(currentTickables.size());
+        for (BlockPos tickPos: currentTickables)
             BlockBehaviours.magicTick(world, tickPos, this);
     }
 

@@ -1,5 +1,6 @@
 package kjk.hiddenmagic.blockextension;
 
+import kjk.hiddenmagic.common.DefaultMap;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -12,20 +13,11 @@ import java.util.Set;
 public class WorldExtension<T> {
     private BlockExtension<T> blockExtension;
     private World world;
-    private HashMap<ChunkPos, ChunkExtension<T>> chunkExtensions = new HashMap<>();
+    protected DefaultMap<ChunkPos, ChunkExtension<T>> chunkExtensions = new DefaultMap<>(ChunkExtension::new);
 
     public WorldExtension(BlockExtension<T> blockExtension, World world) {
         this.blockExtension = blockExtension;
         this.world = world;
-    }
-
-    public ChunkExtension<T> getChunkExtension(ChunkPos pos, boolean create) {
-        ChunkExtension<T> ce = chunkExtensions.get(pos);
-        if (create && ce == null) {
-            ce = new ChunkExtension<T>();
-            chunkExtensions.put(pos, ce);
-        }
-        return ce;
     }
 
     public void clear() {
@@ -38,19 +30,17 @@ public class WorldExtension<T> {
 
     public T get(BlockPos pos) {
         ChunkPos chunkPos = new ChunkPos(pos);
-        ChunkExtension<T> chunkExtension = getChunkExtension(chunkPos, false);
+        ChunkExtension<T> chunkExtension = chunkExtensions.get(chunkPos);
         if (chunkExtension == null)
             return blockExtension.defaultValue();
         return chunkExtension.getOrDefault(pos, blockExtension.defaultValue());
     }
 
-    public void set(BlockPos pos, T value) {
-        set(pos, value, false);
-    }
+    public void set(BlockPos pos, T value) { set(pos, value, false); }
 
     public void set(BlockPos pos, T value, boolean loading) {
         ChunkPos chunkPos = new ChunkPos(pos);
-        ChunkExtension<T> chunkExtension = getChunkExtension(chunkPos, true);
+        ChunkExtension<T> chunkExtension = chunkExtensions.getOrCreate(chunkPos);
 
         if (!loading) {
             Chunk chunk = world.getChunkFromChunkCoords(chunkPos.x, chunkPos.z);

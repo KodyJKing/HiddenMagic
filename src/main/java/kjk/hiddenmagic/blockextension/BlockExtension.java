@@ -1,6 +1,7 @@
 package kjk.hiddenmagic.blockextension;
 
 import kjk.hiddenmagic.HiddenMagic;
+import kjk.hiddenmagic.common.DefaultMap;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -93,7 +94,7 @@ public abstract class BlockExtension<T> {
     @SubscribeEvent
     public void saveChunk(ChunkDataEvent.Save event) {
         WorldExtension<T> worldExtension = getWorldExtension(event.getWorld());
-        ChunkExtension<T> chunk = worldExtension.getChunkExtension(event.getChunk().getPos(), false);
+        ChunkExtension<T> chunk = worldExtension.chunkExtensions.get(event.getChunk().getPos());
         if (chunk == null)
             return;
 

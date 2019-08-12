@@ -23,7 +23,7 @@ public class BehaviourLeaves extends BlockBehaviour {
             }
         }
 
-        double lightFactor = 0.1;
+        double lightFactor = 1;
         InstantFlow.tryFlow(
                 world, pos, (int) (light * lightFactor), 5, true,
                 Common.set(Blocks.LEAVES, Blocks.LEAVES2),

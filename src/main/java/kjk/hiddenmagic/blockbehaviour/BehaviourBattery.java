@@ -10,7 +10,7 @@ public class BehaviourBattery extends BlockBehaviour {
 
     private boolean feedFromTop;
     public BehaviourBattery(boolean feedFromTop) {
-        setCapacity(MagicTypes.LIFE, 8192);
+        setCapacity(MagicTypes.LIFE, 1000000);
         this.feedFromTop = feedFromTop;
     }
 

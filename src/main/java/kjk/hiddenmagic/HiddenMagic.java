@@ -1,6 +1,5 @@
 package kjk.hiddenmagic;
 
-import kjk.hiddenmagic.blockbehaviour.BlockBehaviour;
 import kjk.hiddenmagic.blockbehaviour.BlockBehaviours;
 import kjk.hiddenmagic.magictype.MagicTypes;
 import net.minecraftforge.common.MinecraftForge;
@@ -32,5 +31,6 @@ public class HiddenMagic {
     @EventHandler
     public void postInit(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new ModEvents());
+        BehaviorDispenseBlock.initialize();
     }
 }

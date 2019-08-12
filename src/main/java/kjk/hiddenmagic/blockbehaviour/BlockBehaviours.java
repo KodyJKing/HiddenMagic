@@ -81,11 +81,13 @@ public class BlockBehaviours {
         BlockBehaviour leavesBehaviour = new BehaviourLeaves();
         add(Blocks.LEAVES, leavesBehaviour);
         add(Blocks.LEAVES2, leavesBehaviour);
-        BlockBehaviour logBehaviour = new BlockBehaviour().setCapacity(MagicTypes.LIFE, 32);
+        BlockBehaviour logBehaviour = new BlockBehaviour().setCapacity(MagicTypes.LIFE, 1000);
         add(Blocks.LOG, logBehaviour);
         add(Blocks.LOG2, logBehaviour);
         add(Blocks.MELON_BLOCK, new BehaviourBattery(true));
         add(Blocks.PUMPKIN, new BehaviourBattery(false));
         add(Blocks.CACTUS, new BehaviourCactus());
+        add(Blocks.GRASS, new BehaviourGrass());
+        add(Blocks.TALLGRASS, 2, new BehaviourFern());
     }
 }
